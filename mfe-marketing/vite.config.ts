@@ -11,12 +11,11 @@ export default defineConfig({
       name: "mfe-marketing",
       filename: "remoteEntry.js",
       exposes: {
-        "./Marketing": "./src/marketing.tsx",
+        "./Marketing": "./src/marketing-bootstrap.tsx",
       },
-      shared: {
-        react: { singleton: true },
-        "react-dom": { singleton: true },
-      },
+      // Not shared: v1.4.1 doesn't route react-dom/client's internal `react` import through
+      // shared-scope negotiation, so a singleton react-dom/client here fights the host's
+      // separately-registered react instance and throws "Invalid hook call".
       dts: false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any),
