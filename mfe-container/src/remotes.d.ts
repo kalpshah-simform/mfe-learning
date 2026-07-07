@@ -1,14 +1,25 @@
+interface RemoteMountProps {
+  container: HTMLElement;
+  basename?: string;
+}
+
+interface RemoteModule {
+  bootstrap: () => void;
+  mount: (props: RemoteMountProps) => void;
+  unmount: () => void;
+}
+
 declare module "mfe-auth/Auth" {
-  const Auth: React.ComponentType;
-  export default Auth;
+  const remote: RemoteModule;
+  export default remote;
 }
 
 declare module "mfe-dashboard/Dashboard" {
-  const Dashboard: React.ComponentType;
-  export default Dashboard;
+  const remote: RemoteModule;
+  export default remote;
 }
 
 declare module "mfe-marketing/Marketing" {
-  const Marketing: React.ComponentType;
-  export default Marketing;
+  const remote: RemoteModule;
+  export default remote;
 }

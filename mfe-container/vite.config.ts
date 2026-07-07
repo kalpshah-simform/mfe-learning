@@ -14,8 +14,11 @@ export default defineConfig({
         "mfe-marketing": "http://localhost:5176/assets/remoteEntry.js",
         "mfe-auth": "http://localhost:5174/assets/remoteEntry.js",
       },
-      shared: ["react", "react-dom"],
-    }),
+      // Not shared: remotes each mount their own independent React root and bundle their
+      // own self-consistent React copy (see vite.config.ts comments in the remote repos).
+      dts: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any),
   ],
   build: {
     target: "esnext",

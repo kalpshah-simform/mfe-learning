@@ -1,0 +1,37 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+
+.nav a {
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.main {
+  flex: 1;
+  padding: 32px;
+}
