@@ -1,24 +1,27 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import federation from "@originjs/vite-plugin-federation";
+import { federation } from "@module-federation/vite";
+import { dependencies } from "./package.json";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    // `singleton` and `dts` are valid runtime options missing from this package's shipped types in v1.4.1
     federation({
       name: "mfe-dashboard",
       filename: "remoteEntry.js",
+      dts: false,
       exposes: {
         "./Dashboard": "./src/dashboard.tsx",
       },
-      // Not shared: v1.4.1 doesn't route react-dom/client's internal `react` import through
-      // shared-scope negotiation, so a singleton react-dom/client here fights the host's
-      // separately-registered react instance and throws "Invalid hook call".
-      dts: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any),
+      shared: {
+        react: { requiredVersion: dependencies.react, singleton: true },
+        "react-dom": {
+          requiredVersion: dependencies["react-dom"],
+          singleton: true,
+        },
+      },
+    }),
   ],
   build: {
     target: "esnext",
@@ -26,6 +29,7 @@ export default defineConfig({
   server: {
     port: 5175,
     strictPort: true,
+    origin: "http://localhost:5175",
   },
   preview: {
     port: 5175,

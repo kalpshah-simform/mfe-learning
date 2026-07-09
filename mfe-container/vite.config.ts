@@ -1,24 +1,47 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import federation from "@originjs/vite-plugin-federation";
+import { federation } from "@module-federation/vite";
+import { dependencies } from "./package.json";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    // `singleton` and `dts` are valid runtime options missing from this package's shipped types in v1.4.1
     federation({
       name: "mfe-container",
-      remotes: {
-        "mfe-dashboard": "http://localhost:5175/assets/remoteEntry.js",
-        "mfe-marketing": "http://localhost:5176/assets/remoteEntry.js",
-        "mfe-auth": "http://localhost:5174/assets/remoteEntry.js",
-      },
-      // Not shared: remotes each mount their own independent React root and bundle their
-      // own self-consistent React copy (see vite.config.ts comments in the remote repos).
+      filename: "remoteEntry.js",
       dts: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any),
+      remotes: {
+        "mfe-dashboard": {
+          type: "module",
+          name: "mfe-dashboard",
+          entry: "http://localhost:5175/remoteEntry.js",
+          entryGlobalName: "mfe-dashboard",
+          shareScope: "default",
+        },
+        "mfe-marketing": {
+          type: "module",
+          name: "mfe-marketing",
+          entry: "http://localhost:5176/remoteEntry.js",
+          entryGlobalName: "mfe-marketing",
+          shareScope: "default",
+        },
+        "mfe-auth": {
+          type: "module",
+          name: "mfe-auth",
+          entry: "http://localhost:5174/remoteEntry.js",
+          entryGlobalName: "mfe-auth",
+          shareScope: "default",
+        },
+      },
+      shared: {
+        react: { requiredVersion: dependencies.react, singleton: true },
+        "react-dom": {
+          requiredVersion: dependencies["react-dom"],
+          singleton: true,
+        },
+      },
+    }),
   ],
   build: {
     target: "esnext",
@@ -26,6 +49,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    origin: "http://localhost:5173",
   },
   preview: {
     port: 5173,

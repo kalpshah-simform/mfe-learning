@@ -36,21 +36,16 @@ function matchRemote(pathname: string) {
 function RemoteOutlet() {
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef<{ key: string; module: RemoteModule } | null>(null);
   const bootstrappedRef = useRef(new Set<string>());
   const activeKey = matchRemote(location.pathname);
 
   useEffect(() => {
-    let cancelled = false;
-
-    if (activeRef.current) {
-      activeRef.current.module.unmount();
-      activeRef.current = null;
-    }
-
     if (!activeKey || !containerRef.current) return;
 
+    let cancelled = false;
+    let mountedModule: RemoteModule | null = null;
     const remote = remotes[activeKey];
+
     remote.load().then((module) => {
       if (cancelled || !containerRef.current) return;
       if (!bootstrappedRef.current.has(activeKey)) {
@@ -61,22 +56,17 @@ function RemoteOutlet() {
         container: containerRef.current,
         basename: remote.prefix,
       });
-      activeRef.current = { key: activeKey, module };
+      mountedModule = module;
     });
 
     return () => {
       cancelled = true;
+      // Defer: the remote's root shares React's scheduler with the host (singleton
+      // React), so unmounting it synchronously here can race the host's own
+      // in-flight render/commit and trigger "unmount while rendering" warnings.
+      queueMicrotask(() => mountedModule?.unmount());
     };
-    // Only re-run when the active remote changes, not on every in-remote navigation.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey]);
-
-  useEffect(() => {
-    return () => {
-      activeRef.current?.module.unmount();
-      activeRef.current = null;
-    };
-  }, []);
 
   if (!activeKey) {
     return <p>Select a section above.</p>;
