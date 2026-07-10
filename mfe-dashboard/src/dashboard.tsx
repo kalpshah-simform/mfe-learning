@@ -1,6 +1,8 @@
 import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import DashboardApp from "./dashboard-app";
+import "./index.module.css";
+import "destyle.css";
 
 let root: Root | null = null;
 let bootstrapped = false;

@@ -1,0 +1,61 @@
+:root {
+  --mfe-dash-text: #6b6375;
+  --mfe-dash-text-h: #08060d;
+  --mfe-dash-bg: #fff;
+  --mfe-dash-border: #e5e4e7;
+  --mfe-dash-code-bg: #f4f3ec;
+  --mfe-dash-accent: #aa3bff;
+  --mfe-dash-accent-bg: rgba(170, 59, 255, 0.1);
+  --mfe-dash-accent-border: rgba(170, 59, 255, 0.5);
+  --mfe-dash-social-bg: rgba(244, 243, 236, 0.5);
+  --mfe-dash-shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --mfe-dash-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mfe-dash-heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mfe-dash-mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--mfe-dash-sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--mfe-dash-text);
+  background: var(--mfe-dash-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mfe-dash-text: #9ca3af;
+    --mfe-dash-text-h: #f3f4f6;
+    --mfe-dash-bg: #16171d;
+    --mfe-dash-border: #2e303a;
+    --mfe-dash-code-bg: #1f2028;
+    --mfe-dash-accent: #c084fc;
+    --mfe-dash-accent-bg: rgba(192, 132, 252, 0.15);
+    --mfe-dash-accent-border: rgba(192, 132, 252, 0.5);
+    --mfe-dash-social-bg: rgba(47, 48, 58, 0.5);
+    --mfe-dash-shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+}
+
+/*
+ * Vite treats this file as a CSS Module: `.card` below gets hashed
+ * (e.g. `_card_a8f3c2`) at build time, so it can't collide with any other
+ * remote's `.card`. The `:root` block above is NOT touched by that
+ * transform — CSS Modules only rewrites class selectors — so its custom
+ * property names are namespaced by hand (--mfe-dash-*) instead. `#root`
+ * and `body` intentionally live in standalone-shell.css, not here — see
+ * that file for why.
+ */
+.card {
+  background: #cce5ff;
+  padding: 48px;
+}

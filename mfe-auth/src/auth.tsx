@@ -1,6 +1,8 @@
 import { createRoot, type Root } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import AuthApp from "./auth-app";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.css";
 
 let root: Root | null = null;
 let bootstrapped = false;

@@ -1,10 +1,27 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { federation } from "@module-federation/vite";
+import prefixSelector from "postcss-prefix-selector";
 import { dependencies } from "./package.json";
 
 // https://vite.dev/config/
 export default defineConfig({
+  css: {
+    postcss: {
+      plugins: [
+        // Scopes destyle.css's global reset (body/html/:root/bare-element
+        // selectors) under .mfe-dash-scope so it can't affect the container
+        // shell or mfe-auth's content once federated. includeFiles
+        // restricts the transform to destyle.css's own file — our own
+        // already-prefixed tokens (index.module.css) and
+        // standalone-shell.css are untouched.
+        prefixSelector({
+          prefix: ".mfe-dash-scope",
+          includeFiles: [/destyle/],
+        }),
+      ],
+    },
+  },
   plugins: [
     react(),
     federation({

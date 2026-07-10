@@ -1,0 +1,27 @@
+/*
+ * Page-shell rules that only make sense for this remote's own standalone
+ * dev entry (main.tsx + its index.html, which has the actual <div
+ * id="root">). Deliberately NOT part of marketing.styles.tsx's GlobalStyle
+ * (rendered by the module exposed via Module Federation): once federated,
+ * "root" is also the id of the container app's own top-level mount div, so
+ * an unscoped `#root` selector here would reshape the container's entire
+ * shell, not just this remote's content. `body` is likewise the host
+ * page's single real <body> — safe only when this remote fully owns the
+ * page, i.e. standalone. Plain CSS on purpose: this file never enters the
+ * federated bundle, so it doesn't need Emotion's namespaced cache.
+ */
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--mfe-mkt-border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}

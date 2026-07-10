@@ -1,4 +1,4 @@
-import './index.css'
+import './standalone-shell.css'
 import { bootstrap, mount } from './auth'
 
 bootstrap();
