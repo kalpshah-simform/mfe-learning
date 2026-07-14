@@ -1,0 +1,41 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+.header {
+  padding: 16px 32px;
+  border-bottom: 1px solid #e5e4e7;
+}
+
+.header h1 {
+  font-size: 22px;
+  margin: 0 0 4px;
+}
+
+.header p {
+  margin: 0;
+  color: #6b6375;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  padding: 24px 32px;
+}
+
+.pane {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #e5e4e7;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.pane h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
