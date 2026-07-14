@@ -16,6 +16,16 @@ export default function AuthLandingPage() {
           <Link to="forgot-password">Forgot password</Link>
         </li>
       </ul>
+      <button
+        type="button"
+        onClick={() =>
+          window.dispatchEvent(
+            new CustomEvent("auth:login", { detail: { userId: "test123" } }),
+          )
+        }
+      >
+        Simulate Login
+      </button>
     </div>
   );
 }

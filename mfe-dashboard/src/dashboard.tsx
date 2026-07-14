@@ -17,6 +17,10 @@ let bootstrapped = false;
 let router: ReturnType<typeof createMemoryRouter> | null = null;
 let lastKnownPath: string | null = null;
 
+function handleAuthLogin(event: Event) {
+  console.log("auth:login received", (event as CustomEvent).detail);
+}
+
 export function bootstrap() {
   if (bootstrapped) return;
   bootstrapped = true;
@@ -36,11 +40,14 @@ export function mount(props: RemoteMountProps) {
     onNavigate(path);
   });
 
+  window.addEventListener("auth:login", handleAuthLogin);
+
   root = createRoot(container);
   root.render(<DashboardApp router={router} />);
 }
 
 export function unmount() {
+  window.removeEventListener("auth:login", handleAuthLogin);
   root?.unmount();
   root = null;
   router = null;
