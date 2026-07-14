@@ -1,12 +1,15 @@
 interface RemoteMountProps {
   container: HTMLElement;
-  basename?: string;
+  basePath: string;
+  initialPath: string;
+  onNavigate: (relativePath: string) => void;
 }
 
 interface RemoteModule {
   bootstrap: () => void;
   mount: (props: RemoteMountProps) => void;
   unmount: () => void;
+  onParentNavigate: (relativePath: string) => void;
 }
 
 declare module "mfe-auth/Auth" {

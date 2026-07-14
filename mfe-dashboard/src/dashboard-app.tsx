@@ -1,19 +1,9 @@
-import { Routes, Route } from "react-router-dom";
-import styles from "./index.module.css";
+import { RouterProvider, type createMemoryRouter } from "react-router-dom";
 
-export default function DashboardApp() {
-  return (
-    <div className="mfe-dash-scope">
-      <Routes>
-        <Route
-          path="/*"
-          element={
-            <div className={styles.card}>
-              <h1>Dashboard</h1>
-            </div>
-          }
-        />
-      </Routes>
-    </div>
-  );
+type MemoryRouter = ReturnType<typeof createMemoryRouter>;
+
+export default function DashboardApp({
+  router,
+}: Readonly<{ router: MemoryRouter }>) {
+  return <RouterProvider router={router} />;
 }

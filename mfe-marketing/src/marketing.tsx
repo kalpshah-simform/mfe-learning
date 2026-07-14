@@ -1,11 +1,21 @@
 import { createRoot, type Root } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { createMemoryRouter } from "react-router-dom";
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 import MarketingApp from "./marketing-app";
+import { marketingRoutes } from "./router/routes";
+
+interface RemoteMountProps {
+  container: HTMLElement;
+  basePath: string;
+  initialPath: string;
+  onNavigate: (relativePath: string) => void;
+}
 
 let root: Root | null = null;
 let bootstrapped = false;
+let router: ReturnType<typeof createMemoryRouter> | null = null;
+let lastKnownPath: string | null = null;
 
 // Emotion's default cache is a module-level singleton. If this remote and
 // the host (or another remote) each end up with their own copy of
@@ -20,14 +30,24 @@ export function bootstrap() {
   bootstrapped = true;
 }
 
-export function mount(props: { container: HTMLElement; basename?: string }) {
-  const { container, basename = "/" } = props;
+export function mount(props: RemoteMountProps) {
+  const { container, initialPath, onNavigate } = props;
+
+  lastKnownPath = initialPath;
+  router = createMemoryRouter(marketingRoutes, {
+    initialEntries: [initialPath],
+  });
+  router.subscribe((state) => {
+    const path = state.location.pathname;
+    if (path === lastKnownPath) return;
+    lastKnownPath = path;
+    onNavigate(path);
+  });
+
   root = createRoot(container);
   root.render(
     <CacheProvider value={emotionCache}>
-      <BrowserRouter basename={basename}>
-        <MarketingApp />
-      </BrowserRouter>
+      <MarketingApp router={router} />
     </CacheProvider>,
   );
 }
@@ -35,4 +55,11 @@ export function mount(props: { container: HTMLElement; basename?: string }) {
 export function unmount() {
   root?.unmount();
   root = null;
+  router = null;
+}
+
+export function onParentNavigate(relativePath: string) {
+  if (!router || relativePath === lastKnownPath) return;
+  lastKnownPath = relativePath;
+  router.navigate(relativePath, { replace: true });
 }

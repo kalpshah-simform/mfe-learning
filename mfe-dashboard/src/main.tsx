@@ -1,5 +1,14 @@
 import './standalone-shell.css'
-import { bootstrap, mount } from './dashboard'
+import { bootstrap, mount, onParentNavigate } from './dashboard'
 
 bootstrap();
-mount({ container: document.getElementById('root')!, basename: '/' });
+mount({
+  container: document.getElementById('root')!,
+  basePath: '',
+  initialPath: window.location.pathname || '/',
+  onNavigate: (path) => window.history.pushState(null, '', path),
+});
+
+window.addEventListener('popstate', () => {
+  onParentNavigate(window.location.pathname || '/');
+});

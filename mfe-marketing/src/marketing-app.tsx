@@ -1,13 +1,9 @@
-import { Route, Routes } from "react-router-dom";
-import { GlobalStyle } from "./marketing.styles";
+import { RouterProvider, type createMemoryRouter } from "react-router-dom";
 
-export default function MarketingApp() {
-  return (
-    <>
-      <GlobalStyle />
-      <Routes>
-        <Route path="/*" element={<h1>Marketing</h1>} />
-      </Routes>
-    </>
-  );
+type MemoryRouter = ReturnType<typeof createMemoryRouter>;
+
+export default function MarketingApp({
+  router,
+}: Readonly<{ router: MemoryRouter }>) {
+  return <RouterProvider router={router} />;
 }

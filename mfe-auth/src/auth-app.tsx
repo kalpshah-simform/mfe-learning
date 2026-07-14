@@ -1,18 +1,9 @@
-import { Route, Routes } from "react-router-dom";
+import { RouterProvider, type createMemoryRouter } from "react-router-dom";
 
-export default function AuthApp() {
-  return (
-    <div className="mfe-auth-scope">
-      <Routes>
-        <Route
-          path="/*"
-          element={
-            <div className="mfe-auth-card">
-              <h1>Authentication</h1>
-            </div>
-          }
-        />
-      </Routes>
-    </div>
-  );
+type MemoryRouter = ReturnType<typeof createMemoryRouter>;
+
+export default function AuthApp({
+  router,
+}: Readonly<{ router: MemoryRouter }>) {
+  return <RouterProvider router={router} />;
 }
