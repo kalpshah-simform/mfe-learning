@@ -9,7 +9,7 @@ import { Global, css } from "@emotion/react";
  * by Emotion when it unmounts.
  *
  * Only namespaced (--mfe-mkt-*) custom properties live here, so this is
- * safe to render from the federated path (marketing-bootstrap.tsx) without
+ * safe to render from the federated path (marketing.tsx) without
  * colliding with the same token names in mfe-auth, mfe-dashboard, or
  * mfe-container. The non-prefixable page-shell rules (`#root`, `body`) live
  * in standalone-shell.css instead, imported only by main.tsx — see that
