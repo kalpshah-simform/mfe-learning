@@ -12,7 +12,7 @@ export default defineConfig({
       filename: "remoteEntry.js",
       dts: false,
       exposes: {
-        "./Marketing": "./src/marketing-bootstrap.tsx",
+        "./Marketing": "./src/marketing.tsx",
       },
       shared: {
         react: { requiredVersion: dependencies.react, singleton: true },
