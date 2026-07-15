@@ -17,6 +17,17 @@ let bootstrapped = false;
 let router: ReturnType<typeof createMemoryRouter> | null = null;
 let lastKnownPath: string | null = null;
 
+// This listener is only ever attached while dashboard is mounted (see mount/unmount
+// below). auth fires 'auth:login' once, 500ms after IT loads — a plain DOM
+// CustomEvent has no memory, so if dashboard isn't mounted yet at that moment,
+// the event is gone forever and this handler never runs, even though the user
+// really did log in. Confirmed by: load container -> auth, let the event
+// auto-fire, THEN navigate to /dashboard — "auth:login received" never logs.
+// This is why durable state (e.g. "is the user logged in") can't be
+// represented as a one-shot event; it needs to be propagated as state (a
+// shared store, container-held state pushed via props/callbacks, etc.) that a
+// late-mounting subscriber can read on mount instead of only reacting to a
+// dispatch it may have missed.
 function handleAuthLogin(event: Event) {
   console.log("auth:login received", (event as CustomEvent).detail);
 }

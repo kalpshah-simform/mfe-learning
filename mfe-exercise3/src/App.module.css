@@ -1,0 +1,43 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--mfe-container-border);
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+
+.nav a {
+  color: var(--mfe-container-text-h);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.main {
+  flex: 1;
+  padding: 32px;
+}
+
+.hint {
+  margin: 0 0 16px;
+  color: var(--mfe-container-text-h);
+  font-size: 14px;
+}
