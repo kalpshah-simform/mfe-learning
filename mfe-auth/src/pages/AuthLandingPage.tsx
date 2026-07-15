@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { store } from "shared/store";
 
 function dispatchLoginEvent() {
   window.dispatchEvent(
@@ -8,6 +9,10 @@ function dispatchLoginEvent() {
 }
 
 export default function AuthLandingPage() {
+  useEffect(() => {
+    console.log("shared/store __id in mfe-auth:", store.__id);
+  }, []);
+
   useEffect(() => {
     // Simulates auth's real login flow completing shortly after page load —
     // e.g. a token refresh or SSO redirect resolving. Fires whether or not
