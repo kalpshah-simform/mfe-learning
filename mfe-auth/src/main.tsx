@@ -7,6 +7,7 @@ mount({
   basePath: '',
   initialPath: window.location.pathname || '/',
   onNavigate: (path) => window.history.pushState(null, '', path),
+  onAuthChange: (payload) => console.log('onAuthChange', payload),
 });
 
 window.addEventListener('popstate', () => {

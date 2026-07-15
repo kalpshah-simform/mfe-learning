@@ -122,7 +122,7 @@ function App() {
       <div className={styles.shell}>
         <header className={styles.header}>
           <Link to="/">
-            <h1>Container</h1>
+            <h1>Exercise 2 — Callback Pattern</h1>
           </Link>
           <nav className={styles.nav}>
             <Link to="/auth">Auth</Link>
