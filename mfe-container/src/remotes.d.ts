@@ -4,6 +4,7 @@ interface RemoteMountProps {
   initialPath: string;
   onNavigate: (relativePath: string) => void;
   onAuthChange: (payload: { isAuthenticated: boolean; userId: string }) => void;
+  isSignedIn: boolean;
 }
 
 interface RemoteModule {

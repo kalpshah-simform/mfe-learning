@@ -12,6 +12,7 @@ interface RemoteMountProps {
   initialPath: string;
   onNavigate: (relativePath: string) => void;
   onAuthChange: (payload: AuthChangePayload) => void;
+  isSignedIn: boolean;
 }
 
 let root: Root | null = null;

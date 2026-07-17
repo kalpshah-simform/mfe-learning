@@ -10,6 +10,7 @@ interface RemoteMountProps {
   basePath: string;
   initialPath: string;
   onNavigate: (relativePath: string) => void;
+  isSignedIn: boolean;
 }
 
 let root: Root | null = null;
