@@ -3,8 +3,6 @@ import AuthLayout from "../layouts/AuthLayout";
 import AuthLandingPage from "../pages/AuthLandingPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
-import ForgotPasswordPage from "../pages/ForgotPasswordPage";
-import ResetPasswordPage from "../pages/ResetPasswordPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 export const authRoutes: RouteObject[] = [
@@ -15,8 +13,20 @@ export const authRoutes: RouteObject[] = [
       { index: true, element: <AuthLandingPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage /> },
-      { path: "forgot-password", element: <ForgotPasswordPage /> },
-      { path: "reset-password/:token", element: <ResetPasswordPage /> },
+      {
+        path: "forgot-password",
+        lazy: () =>
+          import("../pages/ForgotPasswordPage").then((m) => ({
+            Component: m.default,
+          })),
+      },
+      {
+        path: "reset-password/:token",
+        lazy: () =>
+          import("../pages/ResetPasswordPage").then((m) => ({
+            Component: m.default,
+          })),
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

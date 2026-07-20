@@ -7,6 +7,7 @@ mount({
   basePath: "",
   initialPath: window.location.pathname || "/",
   onNavigate: (path) => window.history.pushState(null, "", path),
+  isSignedIn: false,
 });
 
 window.addEventListener("popstate", () => {

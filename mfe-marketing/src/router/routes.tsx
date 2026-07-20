@@ -1,8 +1,6 @@
 import type { RouteObject } from "react-router-dom";
 import MarketingLayout from "../layouts/MarketingLayout";
 import HomePage from "../pages/HomePage";
-import PricingPage from "../pages/PricingPage";
-import AboutPage from "../pages/AboutPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 export const marketingRoutes: RouteObject[] = [
@@ -11,8 +9,18 @@ export const marketingRoutes: RouteObject[] = [
     element: <MarketingLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "pricing", element: <PricingPage /> },
-      { path: "about", element: <AboutPage /> },
+      {
+        path: "pricing",
+        lazy: () =>
+          import("../pages/PricingPage").then((m) => ({
+            Component: m.default,
+          })),
+      },
+      {
+        path: "about",
+        lazy: () =>
+          import("../pages/AboutPage").then((m) => ({ Component: m.default })),
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

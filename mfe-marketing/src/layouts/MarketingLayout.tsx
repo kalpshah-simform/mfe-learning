@@ -1,7 +1,10 @@
-import { Link, Outlet } from "react-router-dom";
-import { GlobalStyle } from "../marketing.styles";
+import { Link, Outlet, useNavigation } from "react-router-dom";
+import { GlobalStyle, Spinner } from "../marketing.styles";
 
 export default function MarketingLayout() {
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+
   return (
     <>
       <GlobalStyle />
@@ -9,7 +12,7 @@ export default function MarketingLayout() {
         <Link to="/">Home</Link> | <Link to="/pricing">Pricing</Link> |{" "}
         <Link to="/about">About</Link>
       </nav>
-      <Outlet />
+      {isLoading ? <Spinner /> : <Outlet />}
     </>
   );
 }

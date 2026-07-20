@@ -1,10 +1,6 @@
 import type { RouteObject } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import OverviewPage from "../pages/OverviewPage";
-import ReportsListPage from "../pages/ReportsListPage";
-import ReportDetailPage from "../pages/ReportDetailPage";
-import SettingsPage from "../pages/SettingsPage";
-import ProfileSettingsPage from "../pages/ProfileSettingsPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 export const dashboardRoutes: RouteObject[] = [
@@ -16,15 +12,39 @@ export const dashboardRoutes: RouteObject[] = [
       {
         path: "reports",
         children: [
-          { index: true, element: <ReportsListPage /> },
-          { path: ":id", element: <ReportDetailPage /> },
+          {
+            index: true,
+            lazy: () =>
+              import("../pages/ReportsListPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: ":id",
+            lazy: () =>
+              import("../pages/ReportDetailPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
         ],
       },
       {
         path: "settings",
         children: [
-          { index: true, element: <SettingsPage /> },
-          { path: "profile", element: <ProfileSettingsPage /> },
+          {
+            index: true,
+            lazy: () =>
+              import("../pages/SettingsPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: "profile",
+            lazy: () =>
+              import("../pages/ProfileSettingsPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
         ],
       },
       { path: "*", element: <NotFoundPage /> },

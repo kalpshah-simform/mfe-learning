@@ -100,6 +100,7 @@ function RemoteOutlet({
   const lastRemoteReportedPathRef = useRef<string | null>(null);
   const locationRef = useRef(location);
   const activeKey = matchRemote(location.pathname);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     locationRef.current = location;
@@ -125,6 +126,10 @@ function RemoteOutlet({
     const remote = remotes[activeKey];
     const initialPath = relativePathFor(remote.prefix, location.pathname);
 
+    // Suppressed: this drives a loading indicator for the in-flight remote
+    // fetch below — the state update is intentional, not an effect-derived sync.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsLoading(true);
     remote.load().then((module) => {
       if (cancelled || !containerRef.current) return;
       if (!bootstrappedRef.current.has(activeKey)) {
@@ -157,10 +162,12 @@ function RemoteOutlet({
         isSignedIn,
       });
       mountedModuleRef.current = module;
+      setIsLoading(false);
     });
 
     return () => {
       cancelled = true;
+      setIsLoading(false);
       const moduleToUnmount = mountedModuleRef.current;
       mountedModuleRef.current = null;
       lastRemoteReportedPathRef.current = null;
@@ -200,7 +207,16 @@ function RemoteOutlet({
     return <p>Select a section above.</p>;
   }
 
-  return <div ref={containerRef} />;
+  return (
+    <>
+      {isLoading && (
+        <output className={styles.spinner}>
+          <span className={styles.visuallyHidden}>Loading…</span>
+        </output>
+      )}
+      <div ref={containerRef} hidden={isLoading} />
+    </>
+  );
 }
 
 function App() {

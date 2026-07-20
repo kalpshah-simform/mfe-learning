@@ -52,6 +52,9 @@ export default function LoginPage() {
       <p className="mt-3">
         <Link to="/forgot-password">Forgot password?</Link>
       </p>
+      <p>
+        Don&apos;t have an account? <Link to="/signup">Sign up</Link>
+      </p>
     </div>
   );
 }

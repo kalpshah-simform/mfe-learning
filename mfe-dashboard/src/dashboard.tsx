@@ -1,9 +1,9 @@
+import "./index.module.css";
+import "destyle.css";
 import { createRoot, type Root } from "react-dom/client";
 import { createMemoryRouter } from "react-router-dom";
 import DashboardApp from "./dashboard-app";
 import { dashboardRoutes } from "./router/routes";
-import "./index.module.css";
-import "destyle.css";
 
 interface RemoteMountProps {
   container: HTMLElement;

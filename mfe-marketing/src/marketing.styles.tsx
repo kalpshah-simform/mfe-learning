@@ -1,4 +1,5 @@
-import { Global, css } from "@emotion/react";
+import { Global, css, keyframes } from "@emotion/react";
+import styled from "@emotion/styled";
 
 /**
  * Emotion's <Global> injects its <style> tag via a `useInsertionEffect`
@@ -15,6 +16,40 @@ import { Global, css } from "@emotion/react";
  * in standalone-shell.css instead, imported only by main.tsx — see that
  * file for why they can't ship here.
  */
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const SpinnerOutput = styled.output`
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--mfe-mkt-border);
+  border-top-color: var(--mfe-mkt-accent);
+  border-radius: 50%;
+  animation: ${spin} 0.7s linear infinite;
+`;
+
+const VisuallyHidden = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
+export const Spinner = () => (
+  <SpinnerOutput>
+    <VisuallyHidden>Loading…</VisuallyHidden>
+  </SpinnerOutput>
+);
+
 export const GlobalStyle = () => (
   <Global
     styles={css`
