@@ -3,6 +3,12 @@ import react from "@vitejs/plugin-react";
 import { federation } from "@module-federation/vite";
 import { dependencies } from "./package.json";
 
+const mfeAuthUrl =
+  process.env.VITE_AUTH_REMOTE_URL || "http://localhost:5174/remoteEntry.js";
+const mfeDashboardUrl =
+  process.env.VITE_DASHBOARD_REMOTE_URL ||
+  "http://localhost:5175/remoteEntry.js";
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -15,14 +21,14 @@ export default defineConfig({
         "mfe-auth": {
           type: "module",
           name: "mfe-auth",
-          entry: "http://localhost:5174/remoteEntry.js",
+          entry: mfeAuthUrl,
           entryGlobalName: "mfe-auth",
           shareScope: "default",
         },
         "mfe-dashboard": {
           type: "module",
           name: "mfe-dashboard",
-          entry: "http://localhost:5175/remoteEntry.js",
+          entry: mfeDashboardUrl,
           entryGlobalName: "mfe-dashboard",
           shareScope: "default",
         },
