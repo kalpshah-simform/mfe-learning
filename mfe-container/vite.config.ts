@@ -20,6 +20,14 @@ export default defineConfig({
       name: "mfe-container",
       filename: "remoteEntry.js",
       dts: false,
+      // Default 'version-first' strategy needs to know every remote's shared-dep
+      // versions upfront to pick the best compatible one, which is why the plugin
+      // eagerly preloads (fetches + evaluates) all three remotes on every page
+      // load regardless of route. All remotes here pin the same dependency
+      // versions, so 'loaded-first' (resolve to whichever loads first, register
+      // each remote only when it's actually imported) is safe and restores real
+      // per-route lazy loading.
+      shareStrategy: "loaded-first",
       remotes: {
         "mfe-dashboard": {
           type: "module",
