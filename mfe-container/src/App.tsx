@@ -70,6 +70,10 @@ const remotes: Record<
     prefix: "/marketing",
     load: () => import("mfe-marketing/Marketing").then((m) => m.default),
   },
+  settings: {
+    prefix: "/settings",
+    load: () => import("mfe-settings/Settings").then((m) => m.default),
+  },
 };
 
 function matchRemote(pathname: string) {
@@ -109,7 +113,7 @@ function RemoteOutlet({
   useEffect(() => {
     if (!activeKey || !containerRef.current) return;
 
-    if (activeKey === "dashboard" && !isSignedIn) {
+    if ((activeKey === "dashboard" || activeKey === "settings") && !isSignedIn) {
       navigate(
         `/auth/login?redirect=${encodeURIComponent(location.pathname)}`,
         { replace: true },
@@ -266,6 +270,7 @@ function App() {
             {!isSignedIn && <Link to="/auth">Auth</Link>}
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/marketing">Marketing</Link>
+            {isSignedIn && <Link to="/settings">Settings</Link>}
             {isSignedIn && (
               <button type="button" onClick={signOut}>
                 Log Out

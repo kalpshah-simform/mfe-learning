@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import vue from "@vitejs/plugin-vue";
 import { federation } from "@module-federation/vite";
 import { dependencies } from "./package.json";
 
@@ -18,18 +18,15 @@ const mfeSettingsUrl =
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    vue(),
     federation({
-      name: "mfe-container",
+      name: "mfe-container-vue",
       filename: "remoteEntry.js",
       dts: false,
-      // Default 'version-first' strategy needs to know every remote's shared-dep
-      // versions upfront to pick the best compatible one, which is why the plugin
-      // eagerly preloads (fetches + evaluates) all three remotes on every page
-      // load regardless of route. All remotes here pin the same dependency
-      // versions, so 'loaded-first' (resolve to whichever loads first, register
-      // each remote only when it's actually imported) is safe and restores real
-      // per-route lazy loading.
+      // See mfe-container/vite.config.ts for why 'loaded-first' is used
+      // instead of the default 'version-first' strategy: it avoids eagerly
+      // preloading every remote on every page load and restores per-route
+      // lazy loading.
       shareStrategy: "loaded-first",
       remotes: {
         "mfe-dashboard": {
@@ -62,11 +59,11 @@ export default defineConfig({
         },
       },
       shared: {
-        react: { requiredVersion: dependencies.react, singleton: true },
-        "react-dom": {
-          requiredVersion: dependencies["react-dom"],
-          singleton: true,
-        },
+        // This host renders no React itself — it only hands each remote a
+        // DOM container and calls its bootstrap/mount/unmount contract — so,
+        // unlike mfe-container, it has no react/react-dom to contribute to
+        // the shared scope. "shared/store" is still listed so this app's
+        // copy (if it were ever imported) would dedupe against the remotes'.
         "shared/store": {
           requiredVersion: dependencies.shared,
           singleton: true,
@@ -78,12 +75,12 @@ export default defineConfig({
     target: "esnext",
   },
   server: {
-    port: 5173,
+    port: 5180,
     strictPort: true,
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5180",
   },
   preview: {
-    port: 5173,
+    port: 5180,
     strictPort: true,
   },
 });

@@ -1,0 +1,19 @@
+/*
+ * Page-shell rules that only make sense for this remote's own standalone
+ * dev entry (main.ts + its index.html, which has the actual <div
+ * id="root">). Once federated, "root" is also the id of the container app's
+ * own top-level mount div, so this file is deliberately not part of the
+ * federated bundle — an unscoped `#root`/`body` selector would reshape the
+ * container's entire shell, not just this remote's content.
+ */
+#root {
+  width: 960px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100svh;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
