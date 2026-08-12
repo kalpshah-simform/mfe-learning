@@ -64,10 +64,6 @@ export default defineConfig({
           requiredVersion: dependencies["react-dom"],
           singleton: true,
         },
-        "shared/store": {
-          requiredVersion: dependencies.shared,
-          singleton: true,
-        },
       },
     }),
   ],
