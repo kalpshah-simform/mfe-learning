@@ -14,6 +14,8 @@ const mfeMarketingUrl =
 const mfeSettingsUrl =
   process.env.VITE_SETTINGS_REMOTE_URL ||
   "http://localhost:5177/remoteEntry.js";
+const sharedUrl =
+  process.env.VITE_SHARED_REMOTE_URL || "http://localhost:5178/remoteEntry.js";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -60,15 +62,18 @@ export default defineConfig({
           entryGlobalName: "mfe-settings",
           shareScope: "default",
         },
+        shared: {
+          type: "module",
+          name: "shared",
+          entry: sharedUrl,
+          entryGlobalName: "shared",
+          shareScope: "default",
+        },
       },
       shared: {
         react: { requiredVersion: dependencies.react, singleton: true },
         "react-dom": {
           requiredVersion: dependencies["react-dom"],
-          singleton: true,
-        },
-        "shared/store": {
-          requiredVersion: dependencies.shared,
           singleton: true,
         },
       },

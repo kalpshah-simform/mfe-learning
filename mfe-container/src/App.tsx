@@ -37,6 +37,13 @@ function clearSession() {
   sessionStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
+interface SharedStore {
+  __id: number;
+  getState(key: string): unknown;
+  setState(key: string, value: unknown): void;
+  subscribe(key: string, handler: (value: unknown) => void): () => void;
+}
+
 interface RemoteModule {
   bootstrap: () => void;
   mount: (props: {
@@ -49,10 +56,23 @@ interface RemoteModule {
       userId: string;
     }) => void;
     isSignedIn: boolean;
+    store: SharedStore;
   }) => void;
   unmount: () => void;
   onParentNavigate: (relativePath: string) => void;
 }
+
+// Loaded once, here at the top level, rather than by each remote itself: a
+// remote that's also its own host for this same "shared" module hits a
+// Module Federation race when nested inside this container (its dynamic
+// import of "shared/store" intermittently rejects, which trips the
+// preload-error auto-reload safety net into a reload loop). Loading it only
+// from the outermost host — which is never itself loaded as someone else's
+// remote — avoids that nested-host case entirely, and each remote just
+// receives the already-resolved store as a mount() prop.
+const sharedStorePromise: Promise<SharedStore> = import("shared/store").then(
+  (m) => m.store,
+);
 
 const remotes: Record<
   string,
@@ -113,7 +133,10 @@ function RemoteOutlet({
   useEffect(() => {
     if (!activeKey || !containerRef.current) return;
 
-    if ((activeKey === "dashboard" || activeKey === "settings") && !isSignedIn) {
+    if (
+      (activeKey === "dashboard" || activeKey === "settings") &&
+      !isSignedIn
+    ) {
       navigate(
         `/auth/login?redirect=${encodeURIComponent(location.pathname)}`,
         { replace: true },
@@ -134,7 +157,7 @@ function RemoteOutlet({
     // fetch below — the state update is intentional, not an effect-derived sync.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
-    remote.load().then((module) => {
+    Promise.all([remote.load(), sharedStorePromise]).then(([module, store]) => {
       if (cancelled || !containerRef.current) return;
       if (!bootstrappedRef.current.has(activeKey)) {
         module.bootstrap();
@@ -164,6 +187,7 @@ function RemoteOutlet({
           }
         },
         isSignedIn,
+        store,
       });
       mountedModuleRef.current = module;
       setIsLoading(false);
