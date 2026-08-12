@@ -2,6 +2,7 @@ import { createApp, type App } from "vue";
 import { createRouter, createMemoryHistory, type Router } from "vue-router";
 import SettingsApp from "./settings-app.vue";
 import { settingsRoutes } from "./router/routes";
+import type { store as SharedStoreType } from "shared/store";
 
 interface RemoteMountProps {
   container: HTMLElement;
@@ -9,6 +10,7 @@ interface RemoteMountProps {
   initialPath: string;
   onNavigate: (relativePath: string) => void;
   isSignedIn: boolean;
+  store: typeof SharedStoreType;
 }
 
 let app: App | null = null;
@@ -40,7 +42,9 @@ export function bootstrap() {
   // doesn't reload forever, and the overlay makes the reload legible instead
   // of a silent, unexplained refresh.
   window.addEventListener("vite:preloadError", () => {
-    const count = Number(sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0");
+    const count = Number(
+      sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0",
+    );
     if (count >= MAX_PRELOAD_RELOADS) return;
     sessionStorage.setItem(PRELOAD_RELOAD_COUNT_KEY, String(count + 1));
     showUpdateOverlay();
@@ -49,7 +53,7 @@ export function bootstrap() {
 }
 
 export function mount(props: RemoteMountProps) {
-  const { container, initialPath, onNavigate } = props;
+  const { container, initialPath, onNavigate, store } = props;
 
   lastKnownPath = initialPath;
   router = createRouter({
@@ -64,7 +68,7 @@ export function mount(props: RemoteMountProps) {
     onNavigate(path);
   });
 
-  app = createApp(SettingsApp);
+  app = createApp(SettingsApp, { store });
   app.use(router);
 
   router.replace(initialPath);

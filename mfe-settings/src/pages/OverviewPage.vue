@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { store } from "shared/store";
+import { inject, onMounted } from "vue";
+import { sharedStoreKey } from "../shared-store-key";
+
+const store = inject(sharedStoreKey);
 
 onMounted(() => {
-  console.log("shared/store __id in mfe-settings:", store.__id);
+  console.log("shared/store __id in mfe-settings:", store?.__id);
 });
 </script>
 
