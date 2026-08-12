@@ -5,6 +5,14 @@ interface RemoteMountProps {
   onNavigate: (relativePath: string) => void;
   onAuthChange: (payload: { isAuthenticated: boolean; userId: string }) => void;
   isSignedIn: boolean;
+  store: SharedStore;
+}
+
+interface SharedStore {
+  __id: number;
+  getState(key: string): unknown;
+  setState(key: string, value: unknown): void;
+  subscribe(key: string, handler: (value: unknown) => void): () => void;
 }
 
 interface RemoteModule {

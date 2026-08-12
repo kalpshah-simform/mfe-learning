@@ -37,6 +37,18 @@ function relativePathFor(prefix: string, pathname: string) {
   return pathname.slice(prefix.length) || "/";
 }
 
+// Loaded once, here at the top level, rather than by each remote itself: a
+// remote that's also its own host for this same "shared" module hits a
+// Module Federation race when nested inside this container (its dynamic
+// import of "shared/store" intermittently rejects, which trips the
+// preload-error auto-reload safety net into a reload loop). Loading it only
+// from the outermost host — which is never itself loaded as someone else's
+// remote — avoids that nested-host case entirely, and each remote just
+// receives the already-resolved store as a mount() prop.
+const sharedStorePromise: Promise<SharedStore> = import("shared/store").then(
+  (m) => m.store,
+);
+
 const route = useRoute();
 const router = useRouter();
 const { isSignedIn, signIn, signOut } = useSession();
@@ -97,40 +109,43 @@ watch(
       const initialPath = relativePathFor(remote.prefix, route.path);
 
       isLoading.value = true;
-      remote.load().then((module) => {
-        if (cancelled || !containerRef.value) return;
-        if (!bootstrapped.has(key)) {
-          module.bootstrap();
-          bootstrapped.add(key);
-        }
-        module.mount({
-          container: containerRef.value,
-          basePath: remote.prefix,
-          initialPath,
-          onNavigate: (relativePath) => {
-            const fullPath =
-              relativePath === "/"
-                ? remote.prefix
-                : `${remote.prefix}${relativePath}`;
-            lastRemoteReportedPath = fullPath;
-            router.replace(fullPath);
-          },
-          onAuthChange: (payload) => {
-            if (payload.isAuthenticated) {
-              signIn(payload.userId);
-              const redirect = route.query.redirect;
-              router.replace(
-                typeof redirect === "string" ? redirect : "/dashboard",
-              );
-            } else {
-              signOut();
-            }
-          },
-          isSignedIn: signedIn,
-        });
-        mountedModule = module;
-        isLoading.value = false;
-      });
+      Promise.all([remote.load(), sharedStorePromise]).then(
+        ([module, store]) => {
+          if (cancelled || !containerRef.value) return;
+          if (!bootstrapped.has(key)) {
+            module.bootstrap();
+            bootstrapped.add(key);
+          }
+          module.mount({
+            container: containerRef.value,
+            basePath: remote.prefix,
+            initialPath,
+            onNavigate: (relativePath) => {
+              const fullPath =
+                relativePath === "/"
+                  ? remote.prefix
+                  : `${remote.prefix}${relativePath}`;
+              lastRemoteReportedPath = fullPath;
+              router.replace(fullPath);
+            },
+            onAuthChange: (payload) => {
+              if (payload.isAuthenticated) {
+                signIn(payload.userId);
+                const redirect = route.query.redirect;
+                router.replace(
+                  typeof redirect === "string" ? redirect : "/dashboard",
+                );
+              } else {
+                signOut();
+              }
+            },
+            isSignedIn: signedIn,
+            store,
+          });
+          mountedModule = module;
+          isLoading.value = false;
+        },
+      );
     });
   },
   { immediate: true },

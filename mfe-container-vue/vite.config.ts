@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { federation } from "@module-federation/vite";
-import { dependencies } from "./package.json";
 
 const mfeAuthUrl =
   process.env.VITE_AUTH_REMOTE_URL || "http://localhost:5174/remoteEntry.js";
@@ -14,6 +13,8 @@ const mfeMarketingUrl =
 const mfeSettingsUrl =
   process.env.VITE_SETTINGS_REMOTE_URL ||
   "http://localhost:5177/remoteEntry.js";
+const sharedUrl =
+  process.env.VITE_SHARED_REMOTE_URL || "http://localhost:5178/remoteEntry.js";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -57,16 +58,12 @@ export default defineConfig({
           entryGlobalName: "mfe-settings",
           shareScope: "default",
         },
-      },
-      shared: {
-        // This host renders no React itself — it only hands each remote a
-        // DOM container and calls its bootstrap/mount/unmount contract — so,
-        // unlike mfe-container, it has no react/react-dom to contribute to
-        // the shared scope. "shared/store" is still listed so this app's
-        // copy (if it were ever imported) would dedupe against the remotes'.
-        "shared/store": {
-          requiredVersion: dependencies.shared,
-          singleton: true,
+        shared: {
+          type: "module",
+          name: "shared",
+          entry: sharedUrl,
+          entryGlobalName: "shared",
+          shareScope: "default",
         },
       },
     }),
@@ -75,12 +72,12 @@ export default defineConfig({
     target: "esnext",
   },
   server: {
-    port: 5180,
+    port: 5179,
     strictPort: true,
-    origin: "http://localhost:5180",
+    origin: "http://localhost:5179",
   },
   preview: {
-    port: 5180,
+    port: 5179,
     strictPort: true,
   },
 });
