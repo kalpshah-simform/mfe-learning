@@ -5,6 +5,10 @@ import { federation } from "@module-federation/vite";
 import prefixSelector from "postcss-prefix-selector";
 import { dependencies } from "./package.json";
 
+const sharedUrl =
+  process.env.VITE_SHARED_REMOTE_URL ||
+  "http://localhost:5178/remoteEntry.js";
+
 // remoteEntry.js is the manifest a host fetches to discover this remote's
 // chunks. If a CDN/browser caches a stale copy after a redeploy, it can
 // point at chunk files that no longer exist and crash the host. Serve it
@@ -75,14 +79,19 @@ export default defineConfig({
       exposes: {
         "./Auth": "./src/auth.tsx",
       },
+      remotes: {
+        shared: {
+          type: "module",
+          name: "shared",
+          entry: sharedUrl,
+          entryGlobalName: "shared",
+          shareScope: "default",
+        },
+      },
       shared: {
         react: { requiredVersion: dependencies.react, singleton: true },
         "react-dom": {
           requiredVersion: dependencies["react-dom"],
-          singleton: true,
-        },
-        "shared/store": {
-          requiredVersion: dependencies.shared,
           singleton: true,
         },
       },

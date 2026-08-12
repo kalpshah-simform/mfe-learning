@@ -1,15 +1,17 @@
-import './standalone-shell.css'
-import { bootstrap, mount, onParentNavigate } from './dashboard'
+import "./standalone-shell.css";
+import { bootstrap, mount, onParentNavigate } from "./dashboard";
+import { store } from "shared/store";
 
 bootstrap();
 mount({
-  container: document.getElementById('root')!,
-  basePath: '',
-  initialPath: window.location.pathname || '/',
-  onNavigate: (path) => window.history.pushState(null, '', path),
+  container: document.getElementById("root")!,
+  basePath: "",
+  initialPath: window.location.pathname || "/",
+  onNavigate: (path) => window.history.pushState(null, "", path),
   isSignedIn: true,
+  store,
 });
 
-window.addEventListener('popstate', () => {
-  onParentNavigate(window.location.pathname || '/');
+window.addEventListener("popstate", () => {
+  onParentNavigate(window.location.pathname || "/");
 });

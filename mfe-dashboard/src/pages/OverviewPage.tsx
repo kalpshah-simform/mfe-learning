@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { store } from "shared/store";
+import { useSharedStore } from "../shared-store-context";
 import styles from "../index.module.css";
 
 export default function OverviewPage() {
+  const store = useSharedStore();
+
   useEffect(() => {
-    console.log("shared/store __id in mfe-dashboard:", store.__id);
-  }, []);
+    console.log("shared/store __id in mfe-dashboard:", store?.__id);
+  }, [store]);
 
   return (
     <div className={styles.card}>

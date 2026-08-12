@@ -1,5 +1,6 @@
 import "./standalone-shell.css";
 import { bootstrap, mount, onParentNavigate } from "./auth";
+import { store } from "shared/store";
 
 bootstrap();
 mount({
@@ -9,6 +10,7 @@ mount({
   onNavigate: (path) => window.history.pushState(null, "", path),
   onAuthChange: (payload) => console.log("onAuthChange", payload),
   isSignedIn: false,
+  store,
 });
 
 window.addEventListener("popstate", () => {

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { store } from "shared/store";
+import { useSharedStore } from "../shared-store-context";
 
 function dispatchLoginEvent() {
   window.dispatchEvent(
@@ -9,9 +9,11 @@ function dispatchLoginEvent() {
 }
 
 export default function AuthLandingPage() {
+  const store = useSharedStore();
+
   useEffect(() => {
-    console.log("shared/store __id in mfe-auth:", store.__id);
-  }, []);
+    console.log("shared/store __id in mfe-auth:", store?.__id);
+  }, [store]);
 
   useEffect(() => {
     // Simulates auth's real login flow completing shortly after page load —

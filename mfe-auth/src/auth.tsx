@@ -3,6 +3,7 @@ import { createMemoryRouter } from "react-router-dom";
 import AuthApp from "./auth-app";
 import type { AuthChangePayload } from "./auth-change-context";
 import { authRoutes } from "./router/routes";
+import type { store as SharedStoreType } from "shared/store";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.css";
 
@@ -13,6 +14,7 @@ interface RemoteMountProps {
   onNavigate: (relativePath: string) => void;
   onAuthChange: (payload: AuthChangePayload) => void;
   isSignedIn: boolean;
+  store: typeof SharedStoreType;
 }
 
 let root: Root | null = null;
@@ -44,7 +46,9 @@ export function bootstrap() {
   // doesn't reload forever, and the overlay makes the reload legible instead
   // of a silent, unexplained refresh.
   window.addEventListener("vite:preloadError", () => {
-    const count = Number(sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0");
+    const count = Number(
+      sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0",
+    );
     if (count >= MAX_PRELOAD_RELOADS) return;
     sessionStorage.setItem(PRELOAD_RELOAD_COUNT_KEY, String(count + 1));
     showUpdateOverlay();
@@ -53,7 +57,7 @@ export function bootstrap() {
 }
 
 export function mount(props: RemoteMountProps) {
-  const { container, initialPath, onNavigate, onAuthChange } = props;
+  const { container, initialPath, onNavigate, onAuthChange, store } = props;
 
   lastKnownPath = initialPath;
   router = createMemoryRouter(authRoutes, { initialEntries: [initialPath] });
@@ -65,7 +69,9 @@ export function mount(props: RemoteMountProps) {
   });
 
   root = createRoot(container);
-  root.render(<AuthApp router={router} onAuthChange={onAuthChange} />);
+  root.render(
+    <AuthApp router={router} onAuthChange={onAuthChange} store={store} />,
+  );
 }
 
 export function unmount() {

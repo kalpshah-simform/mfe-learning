@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { createMemoryRouter } from "react-router-dom";
 import DashboardApp from "./dashboard-app";
 import { dashboardRoutes } from "./router/routes";
+import type { store as SharedStoreType } from "shared/store";
 
 interface RemoteMountProps {
   container: HTMLElement;
@@ -11,6 +12,7 @@ interface RemoteMountProps {
   initialPath: string;
   onNavigate: (relativePath: string) => void;
   isSignedIn: boolean;
+  store: typeof SharedStoreType;
 }
 
 let root: Root | null = null;
@@ -57,7 +59,9 @@ export function bootstrap() {
   // doesn't reload forever, and the overlay makes the reload legible instead
   // of a silent, unexplained refresh.
   window.addEventListener("vite:preloadError", () => {
-    const count = Number(sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0");
+    const count = Number(
+      sessionStorage.getItem(PRELOAD_RELOAD_COUNT_KEY) ?? "0",
+    );
     if (count >= MAX_PRELOAD_RELOADS) return;
     sessionStorage.setItem(PRELOAD_RELOAD_COUNT_KEY, String(count + 1));
     showUpdateOverlay();
@@ -66,7 +70,7 @@ export function bootstrap() {
 }
 
 export function mount(props: RemoteMountProps) {
-  const { container, initialPath, onNavigate } = props;
+  const { container, initialPath, onNavigate, store } = props;
 
   lastKnownPath = initialPath;
   router = createMemoryRouter(dashboardRoutes, {
@@ -82,7 +86,7 @@ export function mount(props: RemoteMountProps) {
   window.addEventListener("auth:login", handleAuthLogin);
 
   root = createRoot(container);
-  root.render(<DashboardApp router={router} />);
+  root.render(<DashboardApp router={router} store={store} />);
 }
 
 export function unmount() {
