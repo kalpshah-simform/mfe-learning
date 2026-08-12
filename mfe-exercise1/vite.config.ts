@@ -46,12 +46,12 @@ export default defineConfig({
     target: "esnext",
   },
   server: {
-    port: 5177,
+    port: 3001,
     strictPort: true,
-    origin: "http://localhost:5177",
+    origin: "http://localhost:3001",
   },
   preview: {
-    port: 5177,
+    port: 3001,
     strictPort: true,
   },
 });
