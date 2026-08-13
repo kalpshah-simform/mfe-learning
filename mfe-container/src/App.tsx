@@ -125,6 +125,8 @@ function RemoteOutlet({
   const locationRef = useRef(location);
   const activeKey = matchRemote(location.pathname);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     locationRef.current = location;
@@ -157,41 +159,53 @@ function RemoteOutlet({
     // fetch below — the state update is intentional, not an effect-derived sync.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
-    Promise.all([remote.load(), sharedStorePromise]).then(([module, store]) => {
-      if (cancelled || !containerRef.current) return;
-      if (!bootstrappedRef.current.has(activeKey)) {
-        module.bootstrap();
-        bootstrappedRef.current.add(activeKey);
-      }
-      module.mount({
-        container: containerRef.current,
-        basePath: remote.prefix,
-        initialPath,
-        onNavigate: (relativePath) => {
-          const fullPath =
-            relativePath === "/"
-              ? remote.prefix
-              : `${remote.prefix}${relativePath}`;
-          lastRemoteReportedPathRef.current = fullPath;
-          navigate(fullPath, { replace: true });
-        },
-        onAuthChange: (payload) => {
-          if (payload.isAuthenticated) {
-            signIn(payload.userId);
-            const redirect = new URLSearchParams(
-              locationRef.current.search,
-            ).get("redirect");
-            navigate(redirect || "/dashboard", { replace: true });
-          } else {
-            signOut();
-          }
-        },
-        isSignedIn,
-        store,
+    setLoadError(null);
+    Promise.all([remote.load(), sharedStorePromise])
+      .then(([module, store]) => {
+        if (cancelled || !containerRef.current) return;
+        if (!bootstrappedRef.current.has(activeKey)) {
+          module.bootstrap();
+          bootstrappedRef.current.add(activeKey);
+        }
+        module.mount({
+          container: containerRef.current,
+          basePath: remote.prefix,
+          initialPath,
+          onNavigate: (relativePath) => {
+            const fullPath =
+              relativePath === "/"
+                ? remote.prefix
+                : `${remote.prefix}${relativePath}`;
+            lastRemoteReportedPathRef.current = fullPath;
+            navigate(fullPath, { replace: true });
+          },
+          onAuthChange: (payload) => {
+            if (payload.isAuthenticated) {
+              signIn(payload.userId);
+              const redirect = new URLSearchParams(
+                locationRef.current.search,
+              ).get("redirect");
+              navigate(redirect || "/dashboard", { replace: true });
+            } else {
+              signOut();
+            }
+          },
+          isSignedIn,
+          store,
+        });
+        mountedModuleRef.current = module;
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        // Most commonly: the remote's dev/preview server isn't running, so
+        // its remoteEntry.js fetch fails outright. Without this, the promise
+        // above never settles and isLoading stays true forever — an
+        // infinite spinner with no way out.
+        console.error(`Failed to load remote "${activeKey}":`, err);
+        setIsLoading(false);
+        setLoadError(activeKey);
       });
-      mountedModuleRef.current = module;
-      setIsLoading(false);
-    });
 
     return () => {
       cancelled = true;
@@ -205,7 +219,7 @@ function RemoteOutlet({
       queueMicrotask(() => moduleToUnmount?.unmount());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeKey, isSignedIn]);
+  }, [activeKey, isSignedIn, retryTick]);
 
   // Handles browser back/forward (and any other pathname change not caused by
   // the remote itself): forwards the new path down to the mounted remote.
@@ -237,12 +251,27 @@ function RemoteOutlet({
 
   return (
     <>
-      {isLoading && (
+      {loadError && (
+        <div role="alert" className={styles.error}>
+          <p>
+            Couldn&apos;t load &quot;{loadError}&quot;. Is its dev server
+            running?
+          </p>
+          <button type="button" onClick={() => setRetryTick((t) => t + 1)}>
+            Retry
+          </button>
+        </div>
+      )}
+      {isLoading && !loadError && (
         <output className={styles.spinner}>
           <span className={styles.visuallyHidden}>Loading…</span>
         </output>
       )}
-      <div ref={containerRef} hidden={isLoading} data-testid="remote-mount" />
+      <div
+        ref={containerRef}
+        hidden={isLoading || !!loadError}
+        data-testid="remote-mount"
+      />
     </>
   );
 }

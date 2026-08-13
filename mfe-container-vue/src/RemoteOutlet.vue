@@ -58,6 +58,8 @@ const bootstrapped = new Set<string>();
 let mountedModule: RemoteModule | null = null;
 let lastRemoteReportedPath: string | null = null;
 const isLoading = ref(false);
+const loadError = ref<string | null>(null);
+const retryTick = ref(0);
 
 const activeKey = computed(() => matchRemote(route.path));
 
@@ -80,12 +82,13 @@ const activeKey = computed(() => matchRemote(route.path));
 // dependency change, not the immediate invocation. nextTick does, since it
 // always waits for the pending DOM patch regardless of why the callback ran.
 watch(
-  () => [activeKey.value, isSignedIn.value] as const,
+  () => [activeKey.value, isSignedIn.value, retryTick.value] as const,
   ([key, signedIn], _prev, onCleanup) => {
     let cancelled = false;
     onCleanup(() => {
       cancelled = true;
       isLoading.value = false;
+      loadError.value = null;
       const moduleToUnmount = mountedModule;
       mountedModule = null;
       lastRemoteReportedPath = null;
@@ -109,8 +112,9 @@ watch(
       const initialPath = relativePathFor(remote.prefix, route.path);
 
       isLoading.value = true;
-      Promise.all([remote.load(), sharedStorePromise]).then(
-        ([module, store]) => {
+      loadError.value = null;
+      Promise.all([remote.load(), sharedStorePromise])
+        .then(([module, store]) => {
           if (cancelled || !containerRef.value) return;
           if (!bootstrapped.has(key)) {
             module.bootstrap();
@@ -144,8 +148,17 @@ watch(
           });
           mountedModule = module;
           isLoading.value = false;
-        },
-      );
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          // Most commonly: the remote's dev/preview server isn't running, so
+          // its remoteEntry.js fetch fails outright. Without this, the
+          // promise above never settles and isLoading stays true forever —
+          // an infinite spinner with no way out.
+          console.error(`Failed to load remote "${key}":`, err);
+          isLoading.value = false;
+          loadError.value = key;
+        });
     });
   },
   { immediate: true },
@@ -186,9 +199,17 @@ watch(
 <template>
   <p v-if="!activeKey">Select a section above.</p>
   <template v-else>
-    <output v-if="isLoading" :class="styles.spinner">
+    <div v-if="loadError" role="alert" :class="styles.error">
+      <p>Couldn't load "{{ loadError }}". Is its dev server running?</p>
+      <button type="button" @click="retryTick++">Retry</button>
+    </div>
+    <output v-if="isLoading && !loadError" :class="styles.spinner">
       <span :class="styles.visuallyHidden">Loading…</span>
     </output>
-    <div ref="containerRef" v-show="!isLoading" data-testid="remote-mount" />
+    <div
+      ref="containerRef"
+      v-show="!isLoading && !loadError"
+      data-testid="remote-mount"
+    />
   </template>
 </template>

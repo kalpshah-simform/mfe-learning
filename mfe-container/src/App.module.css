@@ -52,6 +52,19 @@
   }
 }
 
+.error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--mfe-container-border);
+  border-radius: 6px;
+}
+
+.error button {
+  flex-shrink: 0;
+}
+
 .visuallyHidden {
   position: absolute;
   width: 1px;
