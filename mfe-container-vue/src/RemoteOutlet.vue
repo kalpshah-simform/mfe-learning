@@ -189,6 +189,6 @@ watch(
     <output v-if="isLoading" :class="styles.spinner">
       <span :class="styles.visuallyHidden">Loading…</span>
     </output>
-    <div ref="containerRef" v-show="!isLoading" />
+    <div ref="containerRef" v-show="!isLoading" data-testid="remote-mount" />
   </template>
 </template>

@@ -19,4 +19,4 @@ npm install
 npm run dev
 ```
 
-Runs on `http://localhost:5180`.
+Runs on `http://localhost:5179`.

@@ -242,7 +242,7 @@ function RemoteOutlet({
           <span className={styles.visuallyHidden}>Loading…</span>
         </output>
       )}
-      <div ref={containerRef} hidden={isLoading} />
+      <div ref={containerRef} hidden={isLoading} data-testid="remote-mount" />
     </>
   );
 }
