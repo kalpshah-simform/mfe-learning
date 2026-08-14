@@ -59,7 +59,15 @@ let mountedModule: RemoteModule | null = null;
 let lastRemoteReportedPath: string | null = null;
 const isLoading = ref(false);
 const loadError = ref<string | null>(null);
-const retryTick = ref(0);
+
+// @module-federation/vite caches a failed remote's load promise internally,
+// so re-running this watch alone would just replay the same cached
+// rejection without a new network request — a full reload is the only way
+// to actually retry (same reasoning as the vite:preloadError handling in
+// main.ts).
+function retryLoad() {
+  window.location.reload();
+}
 
 const activeKey = computed(() => matchRemote(route.path));
 
@@ -82,7 +90,7 @@ const activeKey = computed(() => matchRemote(route.path));
 // dependency change, not the immediate invocation. nextTick does, since it
 // always waits for the pending DOM patch regardless of why the callback ran.
 watch(
-  () => [activeKey.value, isSignedIn.value, retryTick.value] as const,
+  () => [activeKey.value, isSignedIn.value] as const,
   ([key, signedIn], _prev, onCleanup) => {
     let cancelled = false;
     onCleanup(() => {
@@ -201,7 +209,7 @@ watch(
   <template v-else>
     <div v-if="loadError" role="alert" :class="styles.error">
       <p>Couldn't load "{{ loadError }}". Is its dev server running?</p>
-      <button type="button" @click="retryTick++">Retry</button>
+      <button type="button" @click="retryLoad">Retry</button>
     </div>
     <output v-if="isLoading && !loadError" :class="styles.spinner">
       <span :class="styles.visuallyHidden">Loading…</span>

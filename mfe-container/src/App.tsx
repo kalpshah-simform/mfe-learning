@@ -126,7 +126,6 @@ function RemoteOutlet({
   const activeKey = matchRemote(location.pathname);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     locationRef.current = location;
@@ -219,7 +218,7 @@ function RemoteOutlet({
       queueMicrotask(() => moduleToUnmount?.unmount());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeKey, isSignedIn, retryTick]);
+  }, [activeKey, isSignedIn]);
 
   // Handles browser back/forward (and any other pathname change not caused by
   // the remote itself): forwards the new path down to the mounted remote.
@@ -257,7 +256,13 @@ function RemoteOutlet({
             Couldn&apos;t load &quot;{loadError}&quot;. Is its dev server
             running?
           </p>
-          <button type="button" onClick={() => setRetryTick((t) => t + 1)}>
+          {/* @module-federation/vite caches a failed remote's load promise
+              internally, so re-running this component's mount effect alone
+              would just replay the same cached rejection without a new
+              network request — a full reload is the only way to actually
+              retry (same reasoning as the vite:preloadError handling in
+              dashboard.tsx/main.ts). */}
+          <button type="button" onClick={() => window.location.reload()}>
             Retry
           </button>
         </div>
