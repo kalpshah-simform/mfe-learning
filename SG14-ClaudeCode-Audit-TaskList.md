@@ -62,7 +62,7 @@ All 7 items now have Playwright integration tests in `e2e/` (see `e2e/README.md`
 
 ## Deliverables Status
 
-- [ ] **PARTIAL** — **Documented Local Workflow Model** — does a file exist describing the local branch simulation + build validation workflow end-to-end? `local-sim.sh`'s header comment documents the local-simulation half (build all + serve on fixed ports); `BUILD-VALIDATION.md` documents the build-validation half. No single narrative doc ties both together yet — still no unified "workflow model" file.
+- [x] **DONE** — **Documented Local Workflow Model** — does a file exist describing the local branch simulation + build validation workflow end-to-end? `LOCAL-WORKFLOW.md` — a single narrative doc tying together Key Topics 1–4: app/port map, `local-sim.sh` usage, `BUILD-VALIDATION.md`/`scripts/validate-build.sh` usage, `e2e/` usage, a step-by-step "validating a branch before it ships" sequence, and a troubleshooting section. Verified `validate-build.sh check` (28/28) runs clean as documented.
 - [x] **DONE** — **End-to-End Validation Checklist** — does a file exist that turns Key Topics 3–4 above into an actual repeatable checklist (not just prose)? Key Topic 3: `BUILD-VALIDATION.md` + `scripts/validate-build.sh` (all 8 checks). Key Topic 4: `e2e/` Playwright suite (all 7 checks, 15/15 passing) + `e2e/README.md`. Both are real repeatable processes, not just prose.
 
 ---
